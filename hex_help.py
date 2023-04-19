@@ -11,14 +11,13 @@ from tabulate import tabulate
 # --------- Globals / Config
 g_word_size_bits = enums.Word_size._32_BITS
 g_endianness = enums.Endianness.LITTLE
-# print(g_word_size_bits)
-# print(g_endianness)
+
 
 display_format =""
  
 # --------- Functions
 def invert_endianness(x):
-    return int.from_bytes(x.to_bytes(4, byteorder='little'), byteorder='big', signed=False)
+    return int.from_bytes(x.to_bytes(int(g_word_size_bits.value[0]/8), byteorder='little'), byteorder='big', signed=False)
 
 def set_display_format(format_specifier : str):
     global display_format
