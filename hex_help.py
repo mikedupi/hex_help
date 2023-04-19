@@ -6,30 +6,26 @@
 import enums
 import string
 import math
+from tabulate import tabulate
 
 # --------- Globals / Config
 g_word_size_bits = enums.Word_size._32_BITS
 g_endianness = enums.Endianness.LITTLE
-print(g_word_size_bits)
-print(g_endianness)
+# print(g_word_size_bits)
+# print(g_endianness)
 
 display_format =""
  
 # --------- Functions
+def invert_endianness(x):
+    return int.from_bytes(x.to_bytes(4, byteorder='little'), byteorder='big', signed=False)
+
 def set_display_format(format_specifier : str):
     global display_format
     number_of_display_bits = 0
+
     if(format_specifier == enums.Base._2.value[2]):
         number_of_display_bits = int(g_word_size_bits.value[1]) * 4
-
-    # elif(format_specifier == enums.Base._8.value[2]):
-    #     number_of_display_bits = int(g_word_size_bits.value[1]) 
-    
-    # elif(format_specifier == enums.Base._2.value[2]):
-    #     number_of_display_bits = int(g_word_size_bits.value[1]) * 4
-    
-    # elif(format_specifier == enums.Base._2.value[2]):
-    #     number_of_display_bits = int(g_word_size_bits.value[1]) * 4
     
     else:
         number_of_display_bits = int(g_word_size_bits.value[1])    
@@ -81,7 +77,7 @@ try:
     user_value = user_value.replace(" ","")
     decimal_value = eval(user_value)
     input_base = get_base_of_input_string(user_value)
-    print("Displaying all results in {}".format(str(input_base)))
+    print("Displaying all results in {}\n".format(str(input_base)))
     if(input_base != enums.Base._10):
         length_of_input = len(user_value) - 2
     else:
@@ -94,9 +90,30 @@ set_display_format(input_base.value[2])
 
 no_leading_zeros_flipped = invert_bits(decimal_value, False)
 leading_zeros_flipped = invert_bits(decimal_value, True)
-print("Bit Flip:")
+# print("Bit Flip:")
 
-print("Math Without leading zeros: " + display_format.format(no_leading_zeros_flipped).strip())
-print("Math With leading zeros:" + display_format.format(leading_zeros_flipped).strip())
+# print("Math Without leading zeros: " + display_format.format(no_leading_zeros_flipped).strip())
+# print("Math With leading zeros:" + display_format.format(leading_zeros_flipped).strip())
+# print(display_format.format((decimal_value)))
+# print(display_format.format(invert_endianness(decimal_value)))
 
-# codecs.encode()
+display_array = []
+row_array = []
+
+row_array.append("Original")
+row_array.append(display_format.format(decimal_value))
+row_array.append(display_format.format(no_leading_zeros_flipped).strip())
+row_array.append(display_format.format(leading_zeros_flipped).strip())
+
+display_array.append(row_array)
+
+row_array = []
+row_array.append("Endian Swap")
+row_array.append(display_format.format(invert_endianness(decimal_value)))
+row_array.append(display_format.format(invert_endianness(no_leading_zeros_flipped)).strip())
+row_array.append(display_format.format(invert_endianness(leading_zeros_flipped)).strip())
+
+display_array.append(row_array)
+
+print (tabulate(display_array, headers=["","Endian", "No-Zeros BitFlip", "Zeros BitFlip"]))
+print()
